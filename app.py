@@ -13,9 +13,20 @@ from datetime import datetime, date, timedelta
 from functools import wraps
 
 app = Flask(__name__)
+import os
+
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=True
+)
+
+app.secret_key = os.environ.get(
+    "SECRET_KEY",
+    "change-this-in-production"
+)
 app.secret_key = os.environ.get("SECRET_KEY", "spendwise-dev-secret-change-in-prod")
 CORS(app, supports_credentials=True)
-
 DB_PATH = "spendwise.db"
 
 # ══════════════════════════════════════════════════════════════════════
