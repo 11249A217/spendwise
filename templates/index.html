@@ -2,6 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#1a7a3e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SpendWise — Smart Money Tracker</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1635,5 +1640,42 @@ function renderAll(){
 load();
 if(state.user){startApp();}
 </script>
+<script>
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const btn = document.getElementById('installBtn');
+    if(btn) btn.style.display = 'block';
+});
+
+document.getElementById('installBtn')?.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+});
+
+window.addEventListener('appinstalled', () => {
+    document.getElementById('installBtn').style.display = 'none';
+});
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+            .then(() => console.log('SpendWise PWA Ready'))
+            .catch(console.error);
+    });
+}
+</script>
+<button id="installBtn"
+        style="display:none;position:fixed;bottom:20px;left:20px;z-index:9999;padding:12px 20px;border:none;border-radius:12px;background:#1a7a3e;color:white;font-weight:700;cursor:pointer;">
+  📲 Install SpendWise
+</button>
 </body>
 </html>
